@@ -1,0 +1,91 @@
+# .github/workflows/terraform.yml
+
+name: Terraform GitOps
+
+# WHEN TO RUN:
+on:
+  push:
+    branches:
+      - main              # run on every push to main
+    paths:
+      - 'terraform/**'    # ONLY if terraform files changed
+                          # push to README → pipeline does NOT run ✅
+  pull_request:
+    branches:
+      - main              # run plan on every PR (but not apply)
+    paths:
+      - 'terraform/**'
+  workflow_dispatch:      # allow manual trigger from GitHub UI
+
+# ENVIRONMENT VARIABLES:
+# ARM_* variables are automatically read by Terraform Azure provider
+# GitHub secrets → environment variables → Terraform uses them
+# No credentials in code ✅
+env:
+  ARM_CLIENT_ID:       ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET:   ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID:       ${{ secrets.ARM_TENANT_ID }}
+  TF_VERSION:          '1.7.0'
+
+jobs:
+  terraform:
+    name: 'Terraform Plan & Apply'
+    runs-on: ubuntu-latest         # GitHub hosted Linux runner
+
+    defaults:
+      run:
+        working-directory: terraform   # all steps run inside terraform/
+
+    steps:
+
+    # ── STEP 1: Checkout Code ──────────────────────────────────
+    # Same as checkout in Azure DevOps
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    # ── STEP 2: Install Terraform ──────────────────────────────
+    # GitHub hosted runner does not have Terraform by default
+    # This action installs exact version we specify
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+
+    # ── STEP 3: Terraform Init ─────────────────────────────────
+    # Downloads Azure provider plugin (~200MB)
+    # Connects to Azure Storage backend
+    # Reads/writes state from there
+    # Must run before any other terraform command
+    - name: Terraform Init
+      run: terraform init
+
+    # ── STEP 4: Format Check ───────────────────────────────────
+    # Checks code follows standard Terraform formatting
+    # Fails if someone pushed badly formatted code
+    # Like a linter
+    - name: Terraform Format Check
+      run: terraform fmt -check
+
+    # ── STEP 5: Validate ──────────────────────────────────────
+    # Validates syntax and internal consistency
+    # Catches errors before hitting Azure API
+    # Does NOT connect to Azure
+    - name: Terraform Validate
+      run: terraform validate
+
+    # ── STEP 6: Terraform Plan ─────────────────────────────────
+    # DRY RUN — shows exactly what will be created
+    # Connects to Azure, checks what exists vs what code says
+    # Does NOT create anything
+    # Runs on both PR and push to main
+    - name: Terraform Plan
+      run: terraform plan -out=tfplan
+
+    # ── STEP 7: Terraform Apply ────────────────────────────────
+    # ACTUALLY creates resources in Azure
+    # Only runs on push to main branch
+    # NOT on pull requests (safety — review plan first)
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve tfplan
