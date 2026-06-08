@@ -56,7 +56,7 @@ jobs:
     # Reads/writes state from there
     # Must run before any other terraform command
     - name: Terraform Init
-      run: terraform init
+      run: terraform init -upgrade
 
     # ── STEP 4: Format Check ───────────────────────────────────
     # Checks code follows standard Terraform formatting
