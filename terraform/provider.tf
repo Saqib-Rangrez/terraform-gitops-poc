@@ -9,8 +9,8 @@ terraform {
 
   required_providers {
     azurerm = {
-      source  = "hashicorp/azurerm"   # official Azure provider by HashiCorp
-      version = "~> 3.0"              # use any 3.x version
+      source  = "hashicorp/azurerm" # official Azure provider by HashiCorp
+      version = "~> 3.0"            # use any 3.x version
     }
   }
 
@@ -19,10 +19,10 @@ terraform {
   # Every pipeline run reads/writes state from here
   backend "azurerm" {
     resource_group_name  = "rg-terraform-state"
-    storage_account_name = "tfstategitopspoc"    # ← your storage account name
+    storage_account_name = "tfstategitopspoc" # ← your storage account name
     container_name       = "tfstate"
-    key                  = "poc.terraform.tfstate"  # name of state file in container
-    use_azuread_auth      = true  # use Azure AD auth (no access keys needed)
+    key                  = "poc.terraform.tfstate" # name of state file in container
+    use_azuread_auth     = true                    # use Azure AD auth (no access keys needed)
   }
 }
 
@@ -32,5 +32,5 @@ terraform {
 # → no credentials hardcoded here ✅
 
 provider "azurerm" {
-  features {}   # required block even if empty
+  features {} # required block even if empty
 }
