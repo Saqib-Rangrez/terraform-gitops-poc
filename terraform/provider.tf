@@ -22,6 +22,7 @@ terraform {
     storage_account_name = "tfstategitopspoc"    # ← your storage account name
     container_name       = "tfstate"
     key                  = "poc.terraform.tfstate"  # name of state file in container
+    use_azuread_auth      = true  # use Azure AD auth (no access keys needed)
   }
 }
 
