@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.74" # ← changed from ~> 3.0 to ~> 3.74
+      version = "~> 3.74"
     }
   }
 
@@ -17,8 +17,7 @@ terraform {
   }
 }
 
-
 provider "azurerm" {
   features {}
-  resource_provider_registrations = "none" # ← now supported in 3.74
+  resource_provider_registrations = "none"
 }
