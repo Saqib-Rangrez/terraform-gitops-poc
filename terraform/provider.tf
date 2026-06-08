@@ -1,12 +1,10 @@
-# terraform/provider.tf
-
 terraform {
   required_version = ">= 1.0.0"
 
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.0"
+      version = "~> 3.74" # ← changed from ~> 3.0 to ~> 3.74
     }
   }
 
@@ -21,4 +19,5 @@ terraform {
 
 provider "azurerm" {
   features {}
+  resource_provider_registrations = "none" # ← now supported in 3.74
 }
