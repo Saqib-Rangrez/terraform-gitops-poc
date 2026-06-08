@@ -8,11 +8,10 @@ variable "location" {
   description = "Azure region where resource group will be created"
   type        = string
   default     = "East US"
-  # Common values: "East US", "West Europe", "Southeast Asia"
 }
 
 variable "environment" {
-  description = "Environment tag (dev / staging / prod)"
+  description = "Environment tag"
   type        = string
   default     = "dev"
 }
