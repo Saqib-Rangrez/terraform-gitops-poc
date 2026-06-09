@@ -1,7 +1,7 @@
 variable "resource_group_name" {
   description = "Name of the Azure Resource Group to create"
   type        = string
-  default     = "rg-gitops-poc"
+  default     = "rg-gitops-poc2"
 }
 
 variable "location" {
@@ -19,5 +19,5 @@ variable "environment" {
 variable "project_name" {
   description = "Project name used for tagging"
   type        = string
-  default     = "gitops-poc"
+  default     = "gitops-poc1"
 }
